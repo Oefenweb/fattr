@@ -1,0 +1,105 @@
+#!/usr/bin/env python
+
+# -*- coding: utf-8 -*-
+
+"""
+"""
+
+import argparse
+import json
+import os
+import sys
+from threading import Thread
+from fattr import fattr
+
+
+def save(args):
+  """
+  :return:
+  """
+
+  for i in range(args.threads):
+    worker = Thread(target=fattr.collect_file_attrs, args=(i, fattr.worker_queue,))
+    worker.setDaemon(True)
+    worker.start()
+
+  dirs = os.walk(os.path.abspath(args.dir))
+  for (dirpath, dirnames, filenames) in dirs:
+    files = dirnames + filenames
+    for file in files:
+      path = os.path.join(dirpath, file)
+      fattr.worker_queue.put(path)
+
+  fattr.worker_queue.join()
+
+  with open(args.file, 'w') as f:
+    f.write(json.dumps(fattr.file_attrs))
+
+
+def restore(args):
+  """
+  :return:
+  """
+
+  with open(args.file, 'r') as f:
+    fattr.file_attrs = json.load(f)
+
+  for path, attrs in fattr.file_attrs.iteritems():
+    if os.path.exists(path):
+      print path, attrs
+
+def restore_if_needed(args):
+  """
+  :return:
+  """
+
+  print('restore_if_needed')
+
+
+def main():
+  """
+  Main.
+
+  Parses commandline arguments and options, executes supplied sub command.
+
+  @rtype: None
+  @return: Nothing
+  """
+
+  parser = argparse.ArgumentParser('Save and restore file attributes from a directory tree')
+  subparsers = parser.add_subparsers(dest='mode', help='Select the mode of operation')
+
+  save_parser = subparsers.add_parser('save', help='Save the attributes of files from a given directory')
+  save_parser.set_defaults(func=save)
+  save_parser.add_argument('-d', '--dir', type=str, required=True, help='Directory to save file attributes from')
+  save_parser.add_argument('-f', '--file', type=str, required=True, help='File to save file attributes to')
+  save_parser.add_argument('-t', '--threads', type=int, default=4, help='Number of threads')
+
+  restore_parser = subparsers.add_parser('restore', help='Restore the attributes of files from a given directory')
+  restore_parser.set_defaults(func=restore)
+  restore_parser.add_argument('-d', '--dir', type=str, required=True, help='Directory to restore file attributes to')
+  restore_parser.add_argument('-f', '--file', type=str, required=True, help='File to restore file attributes from')
+  restore_parser.add_argument('-t', '--threads', type=int, default=4, help='Number of threads')
+
+  restore_if_needed_parser = subparsers.add_parser('restore-if-needed',
+                                                   help=('Restore the attributes of files from a given directory, '
+                                                         'but only if they have been changed'))
+  restore_if_needed_parser.set_defaults(func=restore_if_needed)
+  restore_if_needed_parser.add_argument('-d', '--dir', type=str, required=True, help='Directory to restore file attributes to')
+  restore_if_needed_parser.add_argument('-t', '--threads', type=int, default=4, help='Number of threads')
+  restore_if_needed_parser.add_argument('-c', '--current',
+                                        type=str,
+                                        required=True,
+                                        help='File to restore file attributes from (current)')
+  restore_if_needed_parser.add_argument('-p', '--previous',
+                                        type=str,
+                                        required=True,
+                                        help='File to compore file attributes with (previous)')
+
+  args = parser.parse_args()
+  args.func(args)
+
+  sys.exit(0)
+
+if __name__ == '__main__':
+  main()
