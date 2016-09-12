@@ -1,21 +1,33 @@
-# fattr
+## fattr
 
-## Run
+#### Run
 
-### Save
+##### Save
 
 ```
 bin/fattr save -d ~/Software -f ~/Desktop/fattr-2016-09-07.json;
 ```
 
-### Restore
+##### Restore
 
 ```
 bin/fattr restore -d ~/Software -f ~/Desktop/fattr-2016-09-07.json;
 ```
 
-### Restore (if needed)
+##### Restore (if needed)
 
 ```
 bin/fattr restore-if-needed -d ~/Software -c ~/Desktop/fattr-2016-09-07.json -p ~/Desktop/fattr-2016-09-06.json;
 ```
+
+#### License
+
+MIT
+
+#### Author Information
+
+* Mischa ter Smitten (based on work of [mandrawer](https://github.com/robertknight/mandrawer/blob/master/save-file-attrs.py))
+
+#### Feedback, bug-reports, requests, ...
+
+Are [welcome](https://github.com/Oefenweb/fattr/issues)!

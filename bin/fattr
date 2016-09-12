@@ -19,7 +19,7 @@ def save(args):
   """
 
   for i in range(args.threads):
-    worker = Thread(target=fattr.collect_file_attrs, args=(i, fattr.worker_queue,))
+    worker = Thread(target=fattr.save_file_attrs, args=(i, fattr.worker_queue,))
     worker.setDaemon(True)
     worker.start()
 
@@ -32,8 +32,14 @@ def save(args):
 
   fattr.worker_queue.join()
 
+  data = {}
+  data['dir'] = args.dir
+  data['files'] = fattr.file_attrs
+
   with open(args.file, 'w') as f:
-    f.write(json.dumps(fattr.file_attrs))
+    f.write(json.dumps(data))
+
+  sys.exit(0)
 
 
 def restore(args):
@@ -41,19 +47,34 @@ def restore(args):
   :return:
   """
 
+  data = {}
   with open(args.file, 'r') as f:
-    fattr.file_attrs = json.load(f)
+    data = json.load(f)
 
-  for path, attrs in fattr.file_attrs.iteritems():
-    if os.path.exists(path):
-      print path, attrs
+  if args.dir != data['dir']:
+    sys.exit(1)
+
+  for i in range(args.threads):
+    worker = Thread(target=fattr.restore_file_attrs, args=(i, fattr.worker_queue,))
+    worker.setDaemon(True)
+    worker.start()
+
+  for file_basename, file_attrs in data['files'].iteritems():
+    path = os.path.join(args.dir, file_basename)
+    data = {'path': path, 'attrs': file_attrs}
+    fattr.worker_queue.put(data)
+
+  fattr.worker_queue.join()
+
+  sys.exit(0)
+
 
 def restore_if_needed(args):
   """
   :return:
   """
 
-  print('restore_if_needed')
+  sys.exit(0)
 
 
 def main():
