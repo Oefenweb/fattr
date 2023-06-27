@@ -15,7 +15,7 @@ try:
     import os
     del os.link
 except OSError:
-  print 'Could not find dmidecode'
+  print('Could not find dmidecode')
   pass
 
 setup(name='fattr',
