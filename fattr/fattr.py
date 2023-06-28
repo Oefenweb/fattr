@@ -76,7 +76,7 @@ def save_file_attrs(path):
     # 'ctime' : file_info.st_ctime,
     'mtime' : file_info.st_mtime,
     'atime' : file_info.st_atime,
-    'checksum' : md5_file(path) if os.path.isfile(path) else None
+    'checksum' : xxhash_file(path) if os.path.isfile(path) else None
   }
 
 
