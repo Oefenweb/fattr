@@ -7,7 +7,6 @@ from __future__ import absolute_import
 import hashlib
 import os
 from Queue import Queue
-from threading import Thread
 
 
 worker_queue = Queue()
@@ -17,6 +16,7 @@ worker_queue = Queue()
 file_attrs = {}
 """
 """
+
 
 def md5_file(path, block_size=128 * 256):
   """
@@ -89,7 +89,7 @@ def restore_file_attrs(path, attrs):
     # ctime = attrs['ctime']
     mtime = attrs['mtime']
     atime = attrs['atime']
-    checksum = attrs['checksum']
+    # checksum = attrs['checksum']
 
     os.chown(path, uid, gid)
     os.chmod(path, mode)
