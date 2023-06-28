@@ -91,11 +91,15 @@ def restore_if_needed(args):
       path = os.path.join(args.dir, file_basename)
 
       if file_basename not in previous_data['files']:
+        print('no-restore', file_basename)
         continue
 
       if file_attrs['checksum'] == previous_data['files'][file_basename]['checksum']:
         data = {'path': path, 'attrs': previous_data['files'][file_basename]}
+        print('restore', file_basename)
         fattr.worker_queue.put(data)
+      else:
+        print('no-restore', file_basename)
 
     fattr.worker_queue.join()
 

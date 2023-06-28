@@ -5,6 +5,8 @@
 
 from __future__ import absolute_import
 import hashlib
+import xxhash
+import io
 import os
 from Queue import Queue
 
@@ -18,19 +20,34 @@ file_attrs = {}
 """
 
 
-def md5_file(path, block_size=128 * 256):
+def md5_file(path, block_size=128 * 512):
   """
   :param path:
   :param block_size:
   :return:
   """
 
-  md5 = hashlib.md5()
-  with open(path, 'rb') as f:
+  hasher = hashlib.md5()
+  with io.open(path, 'rb') as f:
     for chunk in iter(lambda: f.read(block_size), b''):
-      md5.update(chunk)
+      hasher.update(chunk)
 
-  return md5.hexdigest()
+  return hasher.hexdigest()
+
+
+def xxhash_file(path, block_size=128 * 512):
+  """
+  :param path:
+  :param block_size:
+  :return:
+  """
+
+  hasher = xxhash.xxh64()
+  with io.open(path, 'rb') as f:
+    for chunk in iter(lambda: f.read(block_size), b''):
+      hasher.update(chunk)
+
+  return hasher.hexdigest()
 
 
 def save_files_attrs(i, q):
