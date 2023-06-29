@@ -44,7 +44,7 @@ def xxhash_file(path, block_size=128 * 512):
     :return:
     """
 
-    hasher = xxhash.xxh64()
+    hasher = xxhash.xxh3_64()
     with io.open(path, 'rb') as f_p:
         for chunk in iter(lambda: f_p.read(block_size), b''):
             hasher.update(chunk)
