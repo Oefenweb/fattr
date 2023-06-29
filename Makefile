@@ -1,24 +1,22 @@
-all: check source deb
+all: check test source
 
 init:
 	pip install -r requirements.txt
 
-dist: source deb
+init-dev:
+	pip install -r requirements-dev.txt
 
 source:
 	python setup.py sdist
 
-deb:
-	python setup.py --command-packages=stdeb.command bdist_deb
-
 check:
-	find . -name \*.py | xargs pep8 --first
-	find bin -type f | xargs pep8 --first
+	find . -name \*.py | xargs pycodestyle --first
+	find bin -type f | xargs pycodestyle --first
 
 test:
 	nosetests -v
 
 clean:
 	python setup.py clean
-	rm -rf build deb_dist debian dist MANIFEST *.egg-info deb_dist
-	find . -name '*.pyc' -print0 | xargs --no-run-if-empty -0 rm
+	rm -rfv build deb_dist debian dist MANIFEST *.egg-info deb_dist
+	find . -name '*.pyc' -print0 | xargs --no-run-if-empty -0 rm -v
