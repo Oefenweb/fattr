@@ -1,19 +1,30 @@
 # -*- coding: utf-8 -*-
 
+"""
+"""
+
 from __future__ import absolute_import
 from __future__ import print_function
-from setuptools import setup, find_packages
+
 from subprocess import check_output
+
+from setuptools import setup, find_packages
 
 
 def readme():
-    with open('README.md') as f:
-        return f.read()
+    """
+    :return:
+    """
+    with open('README.md') as f_p:
+        return f_p.read()
 
 
 def install_requires():
-    with open('requirements.txt') as f:
-        return [line for line in map(str.lstrip, f.read().splitlines()) if len(line) > 0 and not line.startswith('#')]
+    """
+    :return:
+    """
+    with open('requirements.txt') as f_p:
+        return [line for line in map(str.lstrip, f_p.read().splitlines()) if len(line) > 0 and not line.startswith('#')]
 
 
 # This is needed because vboxvfs lacks support for symbolic / hard links and therefore make source fails
@@ -23,7 +34,7 @@ try:
         import os
 
         del os.link
-except:  # noqa: E722
+except:  # noqa: E722 pylint: disable=W0702
     pass
 
 setup(name='fattr',

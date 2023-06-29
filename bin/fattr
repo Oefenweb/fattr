@@ -41,8 +41,8 @@ def save(args):
     data['dir'] = args.dir
     data['files'] = fattr.file_attrs
 
-    with open(args.file, 'w') as f:
-        f.write(json.dumps(data, indent=2))
+    with open(args.file, 'w') as f_p:
+        f_p.write(json.dumps(data, indent=2))
 
     sys.exit(0)
 
@@ -52,8 +52,8 @@ def restore(args):
     :return:
     """
 
-    with open(args.file, 'r') as f:
-        data = json.load(f)
+    with open(args.file, 'r') as f_p:
+        data = json.load(f_p)
 
         if args.dir != data['dir']:
             sys.exit(1)
@@ -78,9 +78,9 @@ def restore_if_needed(args):
     :return:
     """
 
-    with open(args.current, 'r') as c_f, open(args.previous, 'r') as p_f:
-        current_data = json.load(c_f)
-        previous_data = json.load(p_f)
+    with open(args.current, 'r') as c_f_p, open(args.previous, 'r') as p_f_p:
+        current_data = json.load(c_f_p)
+        previous_data = json.load(p_f_p)
 
         if previous_data['dir'] != current_data['dir'] != args.dir:
             sys.exit(1)

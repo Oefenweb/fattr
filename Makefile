@@ -9,9 +9,15 @@ init-dev:
 source:
 	python setup.py sdist
 
-check:
+check: pycodestyle pylint
+
+pycodestyle:
 	find . -name \*.py | xargs pycodestyle --first
 	find bin -type f | xargs pycodestyle --first
+
+pylint:
+	find . -name \*.py | xargs pylint
+	find bin -type f | xargs pylint
 
 test:
 	nosetests -v

@@ -9,7 +9,7 @@ from __future__ import print_function
 import hashlib
 import io
 import os
-from Queue import Queue
+from queue import Queue
 
 import xxhash
 
@@ -30,8 +30,8 @@ def md5_file(path, block_size=128 * 512):
     """
 
     hasher = hashlib.md5()
-    with io.open(path, 'rb') as f:
-        for chunk in iter(lambda: f.read(block_size), b''):
+    with io.open(path, 'rb') as f_p:
+        for chunk in iter(lambda: f_p.read(block_size), b''):
             hasher.update(chunk)
 
     return hasher.hexdigest()
@@ -45,30 +45,36 @@ def xxhash_file(path, block_size=128 * 512):
     """
 
     hasher = xxhash.xxh64()
-    with io.open(path, 'rb') as f:
-        for chunk in iter(lambda: f.read(block_size), b''):
+    with io.open(path, 'rb') as f_p:
+        for chunk in iter(lambda: f_p.read(block_size), b''):
             hasher.update(chunk)
 
     return hasher.hexdigest()
 
 
-def save_files_attrs(i, q):
+def save_files_attrs(i, w_q):
     """
     :param i:
-    :param q:
+    :param w_q:
     :return:
     """
 
+    del i
     while True:
-        path = q.get()
+        path = w_q.get()
 
         file_basename = os.path.basename(path)
         file_attrs[file_basename] = save_file_attrs(path)
 
-        q.task_done()
+        w_q.task_done()
 
 
 def save_file_attrs(path):
+    """
+    :param path:
+    :return:
+    """
+
     file_info = os.lstat(path)
 
     return {
@@ -82,25 +88,32 @@ def save_file_attrs(path):
     }
 
 
-def restore_files_attrs(i, q):
+def restore_files_attrs(i, w_q):
     """
     :param i:
-    :param q:
+    :param w_q:
     :return:
     """
 
+    del i
     while True:
-        data = q.get()
+        data = w_q.get()
 
         path = data['path']
         attrs = data['attrs']
 
         restore_file_attrs(path, attrs)
 
-        q.task_done()
+        w_q.task_done()
 
 
 def restore_file_attrs(path, attrs):
+    """
+    :param path:
+    :param attrs:
+    :return:
+    """
+
     if os.path.exists(path):
         mode = attrs['mode']
         uid = attrs['uid']
