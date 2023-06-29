@@ -114,17 +114,21 @@ def restore_file_attrs(path, attrs):
     :return:
     """
 
-    if os.path.exists(path):
-        mode = attrs['mode']
-        uid = attrs['uid']
-        gid = attrs['gid']
-        # ctime = attrs['ctime']
-        mtime = attrs['mtime']
-        atime = attrs['atime']
-        # checksum = attrs['checksum']
+    if not os.path.exists(path):
+        return
 
-        os.chown(path, uid, gid)
-        os.chmod(path, mode)
+    mode = attrs['mode']
+    uid = attrs['uid']
+    gid = attrs['gid']
+    # ctime = attrs['ctime']
+    mtime = attrs['mtime']
+    atime = attrs['atime']
+    # checksum = attrs['checksum']
 
-        if os.path.isfile(path):
-            os.utime(path, (atime, mtime))
+    os.chown(path, uid, gid)
+    os.chmod(path, mode)
+
+    if not os.path.isfile(path):
+        return
+
+    os.utime(path, (atime, mtime))
