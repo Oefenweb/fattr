@@ -63,7 +63,7 @@ def restore(args):
             worker.setDaemon(True)
             worker.start()
 
-        for file_basename, file_attrs in data['files'].iteritems():
+        for file_basename, file_attrs in data['files'].items():
             path = os.path.join(args.dir, file_basename)
             data = {'path': path, 'attrs': file_attrs}
             fattr.worker_queue.put(data)
@@ -90,10 +90,14 @@ def restore_if_needed(args):
             worker.setDaemon(True)
             worker.start()
 
-        for file_basename, file_attrs in current_data['files'].iteritems():
+        for file_basename, file_attrs in current_data['files'].items():
             path = os.path.join(args.dir, file_basename)
 
             if file_basename not in previous_data['files']:
+                print('no-restore', file_basename)
+                continue
+
+            if file_attrs['checksum'] is None:
                 print('no-restore', file_basename)
                 continue
 
